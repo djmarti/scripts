@@ -1,5 +1,10 @@
 #!/bin/bash
 # set -x
+# This script takes a pdf or a postscript file and scales and rotates
+# the pages to fit in the sheet of paper. While many Pring Dialog boxes
+# allow the user to do exactly that, this script lets the user fine-tune
+# the scale factor, the width of the margins, the horizontal separation
+# between pages in a 2-page layout, or the offsets. 
 
 usage="Usage: `basename $0`  [-s factor] [-n pages per sheet] [-H hoffset] [-V voffset] [-C padding] [-p paper] [-b] [-h] file.{pdf,ps}\n
    -b adds a blank page at the beginning of the document (used mainly in 2-page-per-sheet copies)."
