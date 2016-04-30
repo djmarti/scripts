@@ -1,9 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """Given a BibTeX file (.bib) with with short and/or long journal names in it,
 return a new .bib file with the journal names abbreviated (default) or
-complete, using the standard abbreviatures of the the Congress Library (or
-something like that)"""
+complete, using the standard abbreviatures of the the Congress Library
+stored in a file called 'journal_abbreviations.txt'.
+
+TODO: It would be cool to fill 'journal_abbreviations.txt' automatically."""
 
 import re
 import os.path
@@ -24,13 +26,16 @@ for o, v in opts:
     if o in ("-l", "--long"):
         complete = True
 
+
 # Original algorithm by Xavier Defrang.
 # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/81330
 # This implementation by alane@sourceforge.net.
+
 class textsub(UserDict):
     """This recipe shows how to use the Python standard re module to perform
     single-pass multiple string substitution using a dictionary."""
-    def __init__(self, dict = None):
+
+    def __init__(self, dict=None):
         self.re = None
         self.regex = None
         UserDict.__init__(self, dict)
@@ -38,7 +43,6 @@ class textsub(UserDict):
     def compile(self):
         if len(self.data) > 0:
             tmp = r"(\b%s\b)" % "|".join(self.data.keys())
-            #tmp = r"(\b%s\b)" % "|".join(map(re.escape, self.data.keys()))
             tmp = tmp.replace(r"\ ", r"\s*")
             if self.re != tmp:
                 self.re = tmp
@@ -52,11 +56,9 @@ class textsub(UserDict):
             return s
         return self.regex.sub(self, s)
 
-jnames = {} # The dictionary we will use
-
-#f_input = os.path.join(os.path.dirname(__file__), "journal_abbreviations.txt")
-f_input = os.path.join(os.path.expanduser("~"), "share/journal_abbreviations.txt")
-print f_input
+jnames = {}
+f_input = os.path.join(os.path.dirname(__file__),
+                       "journal_abbreviations.txt")
 
 fileIN = open(f_input, "r")
 string = fileIN.read()
@@ -71,10 +73,10 @@ if complete:
     final = 1
 
 # Fill dictionary with entries
-rows_re = re.compile('^(\".*\"),\s*(\".*\")') 
+rows_re = re.compile('^(\".*\"),\s*(\".*\")')
 for l in lines:
-     (long, abbrv) = rows_re.search(l).group(1,2)
-     jnames[long]=abbrv
+    (long, abbrv) = rows_re.search(l).group(1, 2)
+    jnames[long] = abbrv
 
 # Read bib file (with full, long journal names)
 b = open(args[0], "r")
@@ -88,5 +90,4 @@ s = journal_pat.sub(r"\1 \3", s)
 X = textsub(jnames)
 X.compile()
 o = X.replace(s)
-print o
-
+print(o)
