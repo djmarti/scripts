@@ -1,3 +1,4 @@
+"Teoriya Veroyatnoste\u\i\ i ee Primeneniya", "Teor. Veroyatnost. i Primenen."
 "Annals of Physics", "Ann. Phys."
 "Annual Review of Neuroscience", "Annu. Rev. Neurosci."
 "Annual Reviews in Psychology", "Annu. Rev. Psychol."
