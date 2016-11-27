@@ -1,0 +1,28 @@
+#!/bin/bash
+
+doc_type=$1
+shift
+
+if [ "$doc_type" != "papers" ] && [ "$doc_type" != "books" ] && [ "$doc_type" != "documents" ]; then
+    exit $OPTERROR
+fi 
+
+if [ -f $HOME/.dmenurc ]; then
+    . $HOME/.dmenurc
+    DMENU="dmenu -l 20 $DMENUOPTS"
+else
+    DMENU='dmenu -i'
+fi
+
+if [ "$doc_type" != "documents" ]; then
+    cmd=`ls ~/${doc_type}/ | $DMENU -p "${doc_type^} " $*`
+    if [ -n "$cmd" ]; then 
+        /usr/bin/see ~/${doc_type}/"${cmd}"
+    fi
+else
+    cmd=`ls -t ~/*.{pdf,png,jpg,txt} | xargs -d '\n' -n1 basename | $DMENU -p "${doc_type^} " $*`
+    if [ -n "$cmd" ]; then 
+        /usr/bin/see ~/"${cmd}"
+    fi
+fi
+
