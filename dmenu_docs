@@ -16,7 +16,7 @@ fi
 
 if [ "$doc_type" != "documents" ]; then
     pre=`ls ~/${doc_type}/*{pdf,djvu} | sed -e 's/.*\/\(.*\)/\1/'`
-    # For books let's sort according to filename length
+    # For books let's sort according to filename length (useful sometimes)
     if [ "$doc_type" == "books" ]; then
         cmd=`echo "$pre" | awk '{ print length($0) " " $0; }' | sort -n | cut -d ' ' -f 2- | $DMENU -p "${doc_type^} " $*`
     else

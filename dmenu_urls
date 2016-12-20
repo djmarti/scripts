@@ -1,0 +1,11 @@
+#!/bin/bash
+
+if [ -f $HOME/.dmenurc ]; then
+    . $HOME/.dmenurc
+    DMENU="dmenu -l 20 $DMENUOPTS"
+else
+    DMENU='dmenu -i'
+fi
+
+cmd=`$DMENU -p "url" $*`
+x-www-browser "${cmd}"

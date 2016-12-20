@@ -33,7 +33,8 @@ while getopts "s:n:V:H:C:p:bh" options; do
         C ) padding=$OPTARG;;
         p ) paper=$OPTARG;;
         b ) blank=1;;
-	h ) echo $usage;;
+	h ) echo $usage
+            exit 1;;
 	\? ) echo $usage
 	exit 1;;
 	* ) echo $usage
