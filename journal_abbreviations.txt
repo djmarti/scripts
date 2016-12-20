@@ -78,6 +78,7 @@
 "SIAM Journal on Applied Mathematics", "SIAM J. Appl. Math"
 "SIAM Journal on Applied Dynamical Systems", "SIAM J. Dyn. Syst."
 "The Journal of Comparative Neurology", "J. Comp. Neurol."
+"The Journal of Mathematical Neuroscience", "J. Math. Neurosci."
 "The Journal of Physiology", "J. Physiol."
 "The American Journal of Psychology", "Am. J. Psychol."
 "Trends in Neurosciences", "Trends Neurosci."
