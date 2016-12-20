@@ -1,0 +1,34 @@
+#!/bin/bash
+
+doc_type=$1
+shift
+
+if [ "$doc_type" != "papers" ] && [ "$doc_type" != "books" ] && [ "$doc_type" != "documents" ]; then
+    exit $OPTERROR
+fi 
+
+if [ -f $HOME/.dmenurc ]; then
+    . $HOME/.dmenurc
+    DMENU="dmenu -l 20 $DMENUOPTS"
+else
+    DMENU='dmenu -i'
+fi
+
+if [ "$doc_type" != "documents" ]; then
+    pre=`ls ~/${doc_type}/*{pdf,djvu} | sed -e 's/.*\/\(.*\)/\1/'`
+    # For books let's sort according to filename length
+    if [ "$doc_type" == "books" ]; then
+        cmd=`echo "$pre" | awk '{ print length($0) " " $0; }' | sort -n | cut -d ' ' -f 2- | $DMENU -p "${doc_type^} " $*`
+    else
+        cmd=`echo "$pre" | $DMENU -p "${doc_type^} " $*`
+    fi
+    if [ -n "$cmd" ]; then 
+        /usr/bin/see ~/${doc_type}/"${cmd}"
+    fi
+else
+    cmd=`ls -t ~/*.{pdf,png,jpg,txt} | xargs -d '\n' -n1 basename | $DMENU -p "${doc_type^} " $*`
+    if [ -n "$cmd" ]; then 
+        /usr/bin/see ~/"${cmd}"
+    fi
+fi
+
