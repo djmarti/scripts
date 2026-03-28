@@ -7,5 +7,8 @@ else
     DMENU='dmenu -i'
 fi
 
-cmd=`$DMENU -p "url" $*`
-x-www-browser "${cmd}"
+cmd=$($DMENU -p "url " $*)
+if [ ! -z $"cmd" ] & [ ${#cmd} -gt 3 ]
+then
+    x-www-browser "${cmd}"
+fi

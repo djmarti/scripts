@@ -5,4 +5,4 @@ if [ -f $HOME/.dmenurc ]; then
 else
     DMENU='dmenu -i'
 fi
-exe=`$DMENU -p "Run: " ${1+"$@"}` && exec $exe
+exe=$(dmenu_path | $DMENU -p "Run: " ${1+"$@"}) && exec $exe

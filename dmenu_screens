@@ -1,0 +1,51 @@
+#!/bin/bash
+if [ -f $HOME/.dmenurc ]; then
+    . $HOME/.dmenurc
+    DMENU="dmenu -l 4 $DMENUOPTS"
+else
+    DMENU='dmenu -i'
+fi
+
+CHOICES="monitor\nlaptop\nprojector\ndual\n"  # Separate each display option with \n
+
+choice=$(echo -e ${CHOICES} | $DMENU -p "Screens: " ${1+"$@"})
+
+#MONITOR="DP1"
+# MONITOR=$(xrandr | grep -e "\<\(DP1\(-[0-9]\)\?\|HDMI1\) connected" | cut -d ' ' -f 1 | head -n1)
+# MONITOR=$(xrandr | grep -e "\<\(DP1\(-[0-9]\)\?\|HDMI1\) connected" | cut -d ' ' -f 1 | head -n1)
+MONITOR="DP-2"
+LAPTOP="eDP-1"
+PROJECTOR="HDMI1"
+xset_cmd="xset r rate 300 200"
+
+function switch_on() {
+    out=$1
+    if [ $# -gt 1 ]
+    then
+        shift
+        xrandr --output $out $@
+    else
+        xrandr --output $out --auto
+    fi
+    out=$1
+    shift
+}
+
+function switch_off() {
+    xrandr --output $1 --off
+}
+
+# HDMI options
+hdmi_options="--mode 3840x2160 -r 30"
+
+# "mirror")  $ xrandr --output <projector> --same-as <desktop>
+case "$choice" in
+    "dual") switch_on ${LAPTOP} && sleep 1 && switch_on ${MONITOR} "--right-of ${LAPTOP}"; eval "${xset_cmd}"
+        ;;
+    "laptop") switch_off ${MONITOR} && sleep 1 && switch_on ${LAPTOP}; eval "${xset_cmd}"
+        ;;
+    "monitor") switch_off ${LAPTOP} && sleep 1 && switch_on ${MONITOR} ${hdmi_options}; eval "${xset_cmd}"
+        ;;
+    "projector") switch_off ${LAPTOP} && sleep 1 && switch_on ${PROJECTOR}
+        ;;
+esac

@@ -3,9 +3,11 @@
 doc_type=$1
 shift
 
-if [ "$doc_type" != "papers" ] && [ "$doc_type" != "books" ] && [ "$doc_type" != "documents" ]; then
+if [ "$doc_type" != "papers" ] && \
+    [ "$doc_type" != "books" ] && \
+    [ "$doc_type" != "documents" ]; then
     exit $OPTERROR
-fi 
+fi
 
 if [ -f $HOME/.dmenurc ]; then
     . $HOME/.dmenurc
@@ -16,18 +18,23 @@ fi
 
 if [ "$doc_type" != "documents" ]; then
     pre=`ls ~/${doc_type}/*{pdf,djvu} | sed -e 's/.*\/\(.*\)/\1/'`
-    # For books let's sort according to filename length (useful sometimes)
+    # For books, let's sort them by filename length. This is useful if
+    # we have abbreviated symbolic links for books checked regularly
+    # (i.e., "bishop.pdf").
     if [ "$doc_type" == "books" ]; then
-        cmd=`echo "$pre" | awk '{ print length($0) " " $0; }' | sort -n | cut -d ' ' -f 2- | $DMENU -p "${doc_type^} " $*`
+        cmd=$(echo "$pre" | awk '{ print length($0) " " $0; }' |
+              sort -n | cut -d ' ' -f 2- | $DMENU -p "${doc_type^} " $*)
     else
-        cmd=`echo "$pre" | $DMENU -p "${doc_type^} " $*`
+        cmd=$(echo "$pre" | $DMENU -p "${doc_type^} " $*)
     fi
-    if [ -n "$cmd" ]; then 
+    if [ -n "$cmd" ]; then
         /usr/bin/see ~/${doc_type}/"${cmd}"
     fi
 else
-    cmd=`ls -t ~/*.{pdf,png,jpg,txt} | xargs -d '\n' -n1 basename | $DMENU -p "${doc_type^} " $*`
-    if [ -n "$cmd" ]; then 
+    cmd=$(ls -t ~/*.{pdf,png,jpg,txt} |
+          xargs -d '\n' -n1 basename |
+          $DMENU -p "${doc_type^} " $*)
+    if [ -n "$cmd" ]; then
         /usr/bin/see ~/"${cmd}"
     fi
 fi

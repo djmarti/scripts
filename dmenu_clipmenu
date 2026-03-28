@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ -f $HOME/.dmenurc ]; then
+    . $HOME/.dmenurc
+    clipmenu -l 20 $DMENUOPTS
+else
+    clipmenu -i
+fi
