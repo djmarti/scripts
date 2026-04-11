@@ -1,0 +1,130 @@
+#!/usr/bin/env python3
+
+"""
+Rename pdf downloaded from arxiv to a more recognizable name.
+
+Example:
+
+  $ arxiv_rename 1206.6471.pdf
+
+renames the file "1206.6471.pdf" to "schoelkopf_etal_icml2012_causal.pdf".
+
+Idea borrowed from https://mil.ad/blog/2019/auto-rename-arxiv-pdf.html.
+
+
+It is useful to process all arxiv files in a directory at once. For that
+you can use the wrapper available at ~/bin/arxive_rename_in_downloads.sh.
+"""
+
+import re
+import sys
+from pathlib import Path
+import feedparser
+from nltk.corpus import stopwords
+
+
+def get_feed(arxiv_id):
+    """Get the feedparse object for a given arxiv id."""
+    return feedparser.parse(
+        f"http://export.arxiv.org/api/query?id_list={arxiv_id}&max_results=1")
+
+
+def get_last_name(s):
+    """Get the last name of an author."""
+    s = str(s).split()[-1].lower()
+    return s
+
+
+def generate_author_string(authors):
+    """Generate the standardized author prefix."""
+    au_head, *au_tail = authors
+    authors_to_show = [au_head]
+    if len(au_tail) <= 2:
+        authors_to_show += au_tail
+    au_string = '_'.join(get_last_name(a.name) for a in authors_to_show)
+    if len(au_tail) > 2:
+        au_string += "_etal"
+    return au_string
+
+
+def extract_conference_name(arxiv_comment):
+    """Guess conference name based on 'comment' field."""
+    m = re.search(r'[A-Z][a-z]*[A-Z]+', arxiv_comment)
+    if m:
+        return m.group().lower()
+    else:
+        return ''
+
+
+def get_first_significant_word_in_title(title):
+    stop_words = stopwords.words('english')
+    title_words = [f.lower() for f in title.split()
+                   if f.lower() not in stop_words]
+    return title_words[0].rstrip(",.:'")
+
+
+def get_paper_information(arxiv_id):
+    feed = get_feed(arxiv_id)
+    return feed.entries[0]
+
+
+def generate_fname(paper):
+    #  print(paper)
+    au_string = generate_author_string(paper["authors"])
+    year = paper["published_parsed"].tm_year
+    if 'arxiv_comment' in paper:
+        conf_name = extract_conference_name(paper['arxiv_comment'])
+    else:
+        conf_name = ''
+    title_first_word = get_first_significant_word_in_title(paper['title'])
+    return f'{au_string}_{conf_name}{year}_{title_first_word}'
+
+
+def show_paper(paper):
+    """Display basic info about paper."""
+    print(paper['title'], paper['published_parsed'].tm_year)
+    print(', '.join([a.name for a in paper['authors']]))
+
+
+def query_yes_no(question):
+    """Ask a yes/no question via raw_input() and return their answer.
+
+    "question" is a string that is presented to the user.
+    """
+    valid = {"yes": True, "y": True, "ye": True, "no": False, "n": False}
+    prompt = " [y/N] "
+
+    while True:
+        sys.stdout.write(question + prompt)
+        choice = input().lower()
+        if choice == "":
+            return valid["no"]
+        elif choice in valid:
+            return valid[choice]
+        else:
+            sys.stdout.write(
+                "Please respond with 'yes' or 'no' (or 'y' or 'n').\n")
+
+
+if __name__ == "__main__":
+    p = Path(sys.argv[1])
+    papers_folder = Path.home() / "papers"
+    arxiv_id = p.stem
+    paper = get_paper_information(arxiv_id)
+    fname_stem = generate_fname(paper)
+    new_p = papers_folder / f"{fname_stem}.pdf"
+    show_paper(paper)
+    print(f"  to be named {new_p}.")
+    if not new_p.exists():
+        interested = query_yes_no("Interested? ")
+        if interested:
+            print(new_p.resolve())
+            print(f"{p.name} -> {new_p}\n")
+            p.rename(new_p)
+        else:
+            print(f"Skipping. Leaving {p.name} as is\n")
+    else:
+        print("File already exists in repository (~/papers). Do you want to remove the original source?")
+        yes_remove = query_yes_no("Remove source? ")
+        if yes_remove:
+            p.unlink()

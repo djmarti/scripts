@@ -1,0 +1,14 @@
+#!/usr/bin/env python3
+"""Process stdin, assumed to contain valid csv, to json."""
+
+import sys
+import pandas as pd
+
+if __name__ == "__main__":
+    try:
+        df = pd.read_csv(sys.stdin)  # it accepts a buffer with a .read() method
+    except Exception as e:
+        raise ApplicationError("String is not valid csv format") from e
+    pd.options.display.float_format = '{:.4f}'.format
+    core_str = df.to_json(index=False, floatfmt='.4f')
+    print(core_str)

@@ -1,0 +1,3 @@
+#!/bin/bash
+: ${VISUAL='nvim'}  # Equivalent to VISUAL=${VISUAL:-vi}
+exec st -e /opt/nvim/bin/nvim ${1+"$@"}

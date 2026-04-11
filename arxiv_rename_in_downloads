@@ -1,0 +1,10 @@
+#!/bin/sh
+
+curr_pwd=$(pwd)
+cd ~/Downloads/
+for i in $(find . -maxdepth 1 -regextype posix-extended -regex "./[0-9]{4}\.[0-9]{4,5}\.pdf")
+do
+    arxiv_rename.py $i
+done
+cd $curr_pwd
+

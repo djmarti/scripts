@@ -1,0 +1,19 @@
+#!/home/ANT.AMAZON.COM/mrtidm/venv/local/bin/python3.12
+"""Process stdin, assumed to contain valid csv, to markdown."""
+
+import sys
+import pandas as pd
+from tabulate import tabulate
+
+if __name__ == "__main__":
+    try:
+        df = pd.read_csv(sys.stdin)  # it accepts a buffer with a .read() method
+    except Exception as e:
+        raise ApplicationError("String is not valid csv format") from e
+    out_str = tabulate(
+        df.to_numpy(dtype="object"),
+        df.columns,
+        tablefmt="pipe",
+        intfmt=",",
+        floatfmt=".4f")
+    print(out_str)
