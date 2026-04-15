@@ -8,12 +8,16 @@ Example:
   $ arxiv_rename 1206.6471.pdf
 
 renames the file "1206.6471.pdf" to "schoelkopf_etal_icml2012_causal.pdf".
+and moves it to the papers directory (~/papers by default).
 
 Idea borrowed from https://mil.ad/blog/2019/auto-rename-arxiv-pdf.html.
 
+It is useful to process all arxiv files in a directory at once. For that you
+can use the wrapper available at `arxive_rename_in_downloads`.
 
-It is useful to process all arxiv files in a directory at once. For that
-you can use the wrapper available at ~/bin/arxive_rename_in_downloads.sh.
+Dependencies:
+  - feedparser
+  - nltk
 """
 
 import re
@@ -22,6 +26,8 @@ from pathlib import Path
 import feedparser
 from nltk.corpus import stopwords
 
+
+PAPERS_FOLDER = Path.home() / "papers"
 
 def get_feed(arxiv_id):
     """Get the feedparse object for a given arxiv id."""
@@ -108,11 +114,10 @@ def query_yes_no(question):
 
 if __name__ == "__main__":
     p = Path(sys.argv[1])
-    papers_folder = Path.home() / "papers"
     arxiv_id = p.stem
     paper = get_paper_information(arxiv_id)
     fname_stem = generate_fname(paper)
-    new_p = papers_folder / f"{fname_stem}.pdf"
+    new_p = PAPERS_FOLDER / f"{fname_stem}.pdf"
     show_paper(paper)
     print(f"  to be named {new_p}.")
     if not new_p.exists():
